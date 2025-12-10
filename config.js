@@ -1,3 +1,7 @@
+// Top-down view for all chapters
+const DEFAULT_PITCH = 0;      // 0 = straight top-down, increase to ~20 if you want slight angle
+const DEFAULT_BEARING = 0;    // 0 = north-up
+
 var config = {
     style: 'mapbox://styles/mapbox/standard-satellite',
     accessToken: 'pk.eyJ1IjoiYWFzaGlzaC1naXMiLCJhIjoiY21qMDZsNGEzMDV6eTNmb3JsbWllNXRoNCJ9.V0Ym93qMlADuEEByv581Lw',
@@ -13,7 +17,7 @@ var config = {
     auto: false,
     title: '2026 Infinite Erie Playbook Priorities',
     subtitle: '',
-    byline: '',
+    byline: 'By Aashish K C',
     footer: 'Source: Infinite Erie Playbook & Erie County <br>Created using <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a> template.',
     chapters: [
 
@@ -40,12 +44,11 @@ To address the increasingly complex needs around homelessness, Housing First Eri
 <li>22 units produced / repaired</li>
 </ul>
 `,
-            // 148 W 21st St, Erie, PA 16502
             location: {
-                center: [-80.101412, 42.110658],
-                zoom: 12,      // tighter on the building
-                pitch: 55,
-                bearing: 15
+                center: [-80.077345, 42.115256], // 148 W. 21st St., Erie, PA
+                zoom: 17,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -69,7 +72,7 @@ To address the increasingly complex needs around homelessness, Housing First Eri
 <b>Total Project Cost:</b> $14,200,000<br>
 <b>Status:</b> Project Development<br><br>
 
-The Gateway to Presque Isle Plan recommends developing Millcreek’s West 6th, 8th, and 12th Streets and Peninsula Drive as a mixed-use, Main Street corridor at the primary entryway to one of Pennsylvania’s most visited destinations. In alignment with the Investment Playbook, the Gateway Plan advances community-wide infrastructure and quality-of-life improvements, including increasing walkability, addressing accessibility, and promoting sustainability.<br><br>
+The Gateway to Presque Isle Plan recommends developing Millcreek’s West 8th Street as a mixed-use, Main Street corridor at the primary entryway to one of Pennsylvania’s most visited destinations. In alignment with the Investment Playbook, the Gateway Plan advances community-wide infrastructure and quality-of-life improvements, including increasing walkability, addressing accessibility, and promoting sustainability.<br><br>
 
 <b>Projected Outcomes / Outputs:</b>
 <ul>
@@ -82,15 +85,14 @@ The Gateway to Presque Isle Plan recommends developing Millcreek’s West 6th, 8
 <li>Promote the Erie Region as a destination</li>
 </ul>
 `,
-            // Approximate center of corridor near W 8th & Peninsula
             location: {
-                center: [-80.1500, 42.1060],
-                zoom: 13.5,   // wider corridor view
-                pitch: 60,
-                bearing: -25
+                center: [-80.1190, 42.1040], // W 8th corridor-ish
+                zoom: 14.8,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
-            rotateAnimation: true,
+            rotateAnimation: false,
             callback: '',
             onChapterEnter: [],
             onChapterExit: []
@@ -116,12 +118,11 @@ Remediation of the former Erie Coke industrial site will restore a critical piec
 <li>Waterfront land prepared for future mixed-use or public space</li>
 </ul>
 `,
-            // 925 E Bay Dr, Erie, PA 16507
             location: {
-                center: [-80.06924, 42.14562],
-                zoom: 17,
-                pitch: 55,
-                bearing: 5
+                center: [-80.066689, 42.143157], // 925 E Bay Dr
+                zoom: 16,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -153,15 +154,14 @@ Ironworks Square encompasses the remediation and revitalization of a key 5-acre 
 <li>New commercial and light industrial space</li>
 </ul>
 `,
-            // 601 W 12th St, Erie, PA 16501
             location: {
-                center: [-80.09509, 42.11842],
-                zoom: 17.3,
-                pitch: 60,
-                bearing: 20
+                center: [-80.09098, 42.11818], // 601 W 12th
+                zoom: 17,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
-            rotateAnimation: true,
+            rotateAnimation: false,
             callback: '',
             onChapterEnter: [],
             onChapterExit: []
@@ -186,12 +186,11 @@ CATCH will position the Corry region as a technology and cyber innovation hub by
 <li>Support for regional employers seeking IT and cyber talent</li>
 </ul>
 `,
-            // 221 N Center St, Corry, PA 16407
             location: {
-                center: [-79.641745, 41.924160],
-                zoom: 16.2,
-                pitch: 50,
-                bearing: 0
+                center: [-79.64002, 41.92209], // 221 N Center St, Corry
+                zoom: 17,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -219,12 +218,11 @@ The McKean Business Park will provide modern, serviced sites for businesses seek
 <li>Improved regional business attraction capacity</li>
 </ul>
 `,
-            // Approximate center near I-90 & Sterrettania Rd
             location: {
-                center: [-80.2140, 42.0300],
-                zoom: 14.2,
-                pitch: 50,
-                bearing: -15
+                center: [-80.1479, 41.9969], // Sterrettania Rd & I-90 approx
+                zoom: 15,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -255,12 +253,11 @@ Grow Erie is a sustainable urban agriculture development at Savocchio Opportunit
 <li>7–10 full-time equivalent jobs in the commercial greenhouse once complete</li>
 </ul>
 `,
-            // Savocchio Opportunity Park – approx.
             location: {
-                center: [-80.0386, 42.1322],
-                zoom: 16.3,
-                pitch: 55,
-                bearing: 10
+                center: [-80.03875, 42.1312], // 1945 Paragon Dr area
+                zoom: 17,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -288,12 +285,11 @@ The Peninsula Drive Trail will enhance safe, multimodal access between neighborh
 <li>Improved pedestrian and cyclist safety</li>
 </ul>
 `,
-            // Presque Isle State Park entrance
             location: {
-                center: [-80.1537, 42.1093],
-                zoom: 13.8,
-                pitch: 55,
-                bearing: -20
+                center: [-80.1071, 42.1094], // Presque Isle State Park entrance area
+                zoom: 14.8,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -321,12 +317,11 @@ The Cornerstone Community Land Trust will support permanently affordable homeown
 <li>Strategic reuse of vacant and underutilized properties</li>
 </ul>
 `,
-            // Approximate central Erie neighborhood
             location: {
-                center: [-80.0800, 42.1180],
-                zoom: 15,
-                pitch: 45,
-                bearing: 10
+                center: [-80.0556, 42.1293], // approx parade/buffalo
+                zoom: 15.5,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -354,12 +349,11 @@ The Multi-Cultural Health Evaluation Delivery System will expand access to cultu
 <li>Expanded preventive and community-based care</li>
 </ul>
 `,
-            // 908–912 Parade St, Erie, PA 16503
             location: {
-                center: [-80.07485, 42.129306],
+                center: [-80.0636, 42.1323], // 908-912 Parade
                 zoom: 17,
-                pitch: 55,
-                bearing: 5
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -387,15 +381,14 @@ Project NePTWNE will leverage Gannon University’s academic and research capaci
 <li>New experiential learning and student talent pipelines</li>
 </ul>
 `,
-            // Gannon University
             location: {
-                center: [-80.0865, 42.1298],
-                zoom: 17.2,
-                pitch: 55,
-                bearing: 10
+                center: [-80.0865, 42.1298], // Gannon
+                zoom: 17,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
-            rotateAnimation: true,
+            rotateAnimation: false,
             callback: '',
             onChapterEnter: [],
             onChapterExit: []
@@ -420,12 +413,11 @@ Flagship Commons will deliver activated mixed-use space in downtown Erie, expand
 <li>Increased downtown foot traffic and activity</li>
 </ul>
 `,
-            // Downtown Erie
             location: {
-                center: [-80.0870, 42.1295],
+                center: [-80.0887, 42.1293],
                 zoom: 17,
-                pitch: 50,
-                bearing: -5
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -438,7 +430,7 @@ Flagship Commons will deliver activated mixed-use space in downtown Erie, expand
             alignment: 'left',
             hidden: false,
             title: 'Playbook Portfolio · Mercantile Building Renovations',
-            image: './images/mercantile_Building.png',
+            image: './images/mercantile_Building.jpg',
             description: `
 <b>Sponsor:</b> Federal Resources Corporation<br>
 <b>Portfolio:</b> Reuse of Historic & Signature Assets<br>
@@ -456,8 +448,8 @@ Renovation of the Mercantile Building will return a signature downtown property 
             location: {
                 center: [-80.0890, 42.1280],
                 zoom: 17,
-                pitch: 50,
-                bearing: 15
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
@@ -485,12 +477,11 @@ East Lakeview Business Park will open new industrial and logistics sites on Erie
 <li>Improved access to employment opportunities</li>
 </ul>
 `,
-            // Approximate eastside industrial area
             location: {
-                center: [-79.9800, 42.1600],
-                zoom: 14.5,
-                pitch: 45,
-                bearing: -10
+                center: [-79.9856, 42.1602],
+                zoom: 15.2,
+                pitch: DEFAULT_PITCH,
+                bearing: DEFAULT_BEARING
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,

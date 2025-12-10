@@ -214,7 +214,7 @@
             border-radius: 16px;
             margin: 10px auto 12px;
             display: block;
-            object-fit: contain; /* no cropping */
+            object-fit: contain;
             background: rgba(15, 23, 42, 0.95);
             padding: 6px;
             box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
@@ -617,6 +617,14 @@
         var map;
         var marker;
 
+        // --- NEW: top-level global view for the globe ---
+        var initialView = {
+            center: [-40, 30], // somewhere over the Atlantic, shows Americas + Europe/Africa
+            zoom: 1.2,
+            pitch: 0,
+            bearing: 0
+        };
+
         var layerTypes = {
             'fill': ['fill-opacity'],
             'line': ['line-opacity'],
@@ -661,7 +669,7 @@
 
         // Placeholder website links (fill these with real URLs)
         var projectLinks = {
-            'affordable-housing-schoolhouse': '',
+            'affordable-housing-schoolhouse': 'https://www.hamothealthfoundation.org/corporators/2025-corporator-project-schoolhouse-apartments',
             'waterfront-presque-isle-gateway': '',
             'waterfront-erie-coke-remediation': '',
             'economic-ironworks-square': '',
@@ -796,7 +804,7 @@
                 thumbContainer.rel = 'noopener noreferrer';
                 thumbContainer.classList.add('overview-thumb-link');
                 thumbContainer.addEventListener('click', function (e) {
-                    e.stopPropagation(); // don’t also scroll
+                    e.stopPropagation();
                 });
             } else {
                 thumbContainer = document.createElement('div');
@@ -924,18 +932,19 @@
 
         mapboxgl.accessToken = config.accessToken;
 
+        // --- MAIN MAP: globe, top-level view, interactive ---
         map = new mapboxgl.Map({
             container: 'map',
             style: config.style,
-            center: config.chapters[0].location.center,
-            zoom: config.chapters[0].location.zoom,
-            bearing: config.chapters[0].location.bearing,
-            pitch: config.chapters[0].location.pitch,
-            interactive: false,
-            projection: config.projection
+            center: initialView.center,
+            zoom: initialView.zoom,
+            bearing: initialView.bearing,
+            pitch: initialView.pitch,
+            interactive: true,
+            projection: 'globe'
         });
 
-        // Initial marker
+        // Initial marker (still points to first Erie project)
         if (config.showMarkers) {
             var firstId = config.chapters[0].id;
             var initialColor = chapterMarkerColors[firstId] || (config.markerColor || '#3FB1CE');
@@ -982,7 +991,7 @@
             var el = document.getElementById(id);
             if (el) {
                 // offset so card doesn't touch the nav/header
-                var headerOffset = 130; // adjust if you want more/less gap
+                var headerOffset = 130;
                 var rect = el.getBoundingClientRect();
                 var offsetTop = rect.top + window.pageYOffset - headerOffset;
                 window.scrollTo({
@@ -1012,6 +1021,18 @@
 
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // When going back to top, also reset map to global view
+            if (map) {
+                map.flyTo({
+                    center: initialView.center,
+                    zoom: initialView.zoom,
+                    pitch: initialView.pitch,
+                    bearing: initialView.bearing,
+                    duration: 2000
+                });
+            }
+
             setActiveNavByChapterId(config.chapters[0].id);
         }
         window.scrollToTop = scrollToTop;
@@ -1040,6 +1061,20 @@
         });
 
         map.on("load", function () {
+            // Ensure globe projection + nice atmosphere
+            map.setProjection('globe');
+            map.setFog({
+                range: [0.8, 8],
+                color: 'rgba(11, 15, 25, 1)',
+                'horizon-blend': 0.05,
+                'high-color': '#1e293b',
+                'space-color': '#020617',
+                'star-intensity': 0.2
+            });
+
+            // Disable scroll zoom so story scroll isn't hijacked, but keep map interactive
+            map.scrollZoom.disable();
+
             if (config.use3dTerrain) {
                 map.addSource('mapbox-dem', {
                     'type': 'raster-dem',
