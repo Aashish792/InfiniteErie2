@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset='utf-8' />
+    <title>2026 Infinite Erie Playbook Priorities</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link rel="icon" type="image/x-icon"
+        href="https://raw.githubusercontent.com/mapbox/assembly/publisher-staging/src/svgs/mapbox.svg">
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-globe-minimap@1.2.0/dist/bundle.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+
+    <style>
+        :root {
+            --bg-deep: #020617;
+            --card-bg: rgba(15, 23, 42, 0.92);
+            --card-border: rgba(148, 163, 184, 0.25);
+            --card-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+            --accent-blue: #38bdf8;
+            --accent-purple: #7c3aed;
+            --accent-cyan: #0ea5e9;
+            --accent-green: #22c55e;
+            --accent-orange: #f97316;
+            --accent-yellow: #eab308;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 5% -20%, #1d4ed8 0, transparent 40%),
+                radial-gradient(circle at 95% -10%, #7c3aed 0, transparent 40%),
+                radial-gradient(circle at 30% 110%, #0f766e 0, transparent 50%),
+                var(--bg-deep);
+            color: #e5e7eb;
+            overflow-x: hidden;
+        }
+
+        a,
+        a:hover,
+        a:visited {
+            color: #7bdff2;
+        }
+
+        /* Map behind everything */
+        #map {
+            top: 0;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+        }
+
+        /* Scroll progress bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            transform-origin: left center;
+            transform: scaleX(0);
+            background: linear-gradient(90deg, #22c55e, #38bdf8, #eab308, #f97316, #7c3aed);
+            z-index: 20;
+            pointer-events: none;
+            transition: transform 0.12s linear;
+        }
+
+        #story {
+            position: relative;
+            z-index: 5;
+        }
+
+        #header {
+            margin: auto;
+            width: 100%;
+            position: relative;
+            margin-top: 105px;
+            animation: fadeUp 0.7s ease-out both;
+        }
+
+        #header h1,
+        #header h2,
+        #header p {
+            margin: 0;
+            padding: 1.5vh 2vw;
+            text-align: center;
+            color: #f9fafb;
+        }
+
+        #header h1 {
+            font-size: 2.2rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        #header h2 {
+            font-size: 1.1rem;
+            opacity: 0.85;
+        }
+
+        #header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        #footer {
+            width: 100%;
+            min-height: 5vh;
+            padding-top: 2vh;
+            padding-bottom: 2vh;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+            position: relative;
+            color: #f9fafb;
+        }
+
+        #features {
+            padding-top: 8vh;
+            padding-bottom: 10vh;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .centered {
+            width: min(52vw, 900px);
+            margin: 0 auto;
+        }
+
+        .lefty {
+            width: min(38vw, 720px);
+            margin-left: 6vw;
+        }
+
+        .righty {
+            width: min(38vw, 720px);
+            margin-left: auto;
+            margin-right: 6vw;
+        }
+
+        .fully {
+            width: 100%;
+            margin: auto;
+        }
+
+        .light {
+            color: #111827;
+            background-color: #f9fafb;
+        }
+
+        .dark {
+            color: #f9fafb;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.06), transparent 55%) var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border-radius: 22px;
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.08), transparent 45%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .step.active .dark::before {
+            opacity: 1;
+        }
+
+        .step {
+            padding-bottom: 50vh;
+            opacity: 0.25;
+            transform: translateY(12px) scale(0.99);
+            transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+            filter: saturate(0.7);
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateY(-2px) scale(1.01);
+            filter: saturate(1.1);
+        }
+
+        .step div {
+            padding: 22px 32px 26px;
+            line-height: 1.7;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.28rem;
+        }
+
+        /* Smaller images, no cropping, centered */
+        .step img {
+            width: 86%;
+            max-width: 520px;
+            max-height: 220px;
+            border-radius: 16px;
+            margin: 10px auto 12px;
+            display: block;
+            object-fit: contain; /* no cropping */
+            background: rgba(15, 23, 42, 0.95);
+            padding: 6px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+        }
+
+        .step.active img:hover {
+            transform: scale(1.02) translateY(-1px);
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.55);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .step p {
+            margin-top: 6px;
+        }
+
+        /* Floating nav with animated gradient & sliding indicator */
+        #top-nav {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            padding: 0;
+            pointer-events: none;
+        }
+
+        #top-nav-inner {
+            position: relative;
+            display: flex;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(120deg,
+                    rgba(59, 130, 246, 0.98),
+                    rgba(14, 165, 233, 0.96),
+                    rgba(124, 58, 237, 0.98));
+            background-size: 220% 220%;
+            animation: navGradient 16s ease infinite;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65);
+            border: 1px solid rgba(248, 250, 252, 0.16);
+            pointer-events: auto;
+        }
+
+        #nav-active-indicator {
+            position: absolute;
+            top: 5px;
+            height: calc(100% - 10px);
+            border-radius: 999px;
+            background: rgba(248, 250, 252, 0.16);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.55);
+            transition: transform 0.25s ease, width 0.25s ease, opacity 0.25s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #top-nav button {
+            border: none;
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 650;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.8);
+            color: #e5e7eb;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s, transform 0.1s, color 0.2s, box-shadow 0.2s, opacity 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+
+        #top-nav button span.dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--accent-green);
+        }
+
+        #top-nav button:nth-child(2) span.dot {
+            background: var(--accent-blue);
+        }
+
+        #top-nav button:nth-child(3) span.dot {
+            background: var(--accent-orange);
+        }
+
+        #top-nav button:nth-child(4) span.dot {
+            background: var(--accent-yellow);
+        }
+
+        #top-nav button:hover {
+            background: rgba(248, 250, 252, 0.95);
+            color: #0f172a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+        }
+
+        #top-nav button:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4);
+        }
+
+        #top-nav button.active {
+            background: rgba(248, 250, 252, 0.98);
+            color: #0f172a;
+        }
+
+        #top-nav button.active span.dot {
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.7);
+        }
+
+        /* Overview section (home screen with all projects) */
+        #overview-section {
+            margin-top: 10px;
+        }
+
+        .overview-card-shell {
+            width: min(76vw, 1200px);
+            margin: 0 auto;
+            padding: 18px 22px 22px;
+        }
+
+        .overview-header-title {
+            margin: 0 0 4px;
+            font-size: 1.2rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.92;
+        }
+
+        .overview-header-subtitle {
+            margin: 0 0 10px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .overview-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.88);
+            border-radius: 18px;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .overview-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+            background: rgba(15, 23, 42, 0.97);
+            border-color: rgba(248, 250, 252, 0.18);
+        }
+
+        .overview-thumb-wrap {
+            flex: 0 0 70px;
+        }
+
+        .overview-thumb-link {
+            display: block;
+        }
+
+        .overview-thumb {
+            width: 68px;
+            height: 68px;
+            border-radius: 14px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .overview-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .overview-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: rgba(148, 163, 184, 0.28);
+        }
+
+        .overview-chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: #22c55e;
+        }
+
+        .overview-title {
+            margin: 0;
+            font-size: 0.92rem;
+        }
+
+        .overview-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .overview-btn,
+        .overview-link-btn {
+            border-radius: 999px;
+            border: none;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(248, 250, 252, 0.96);
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            transition: background 0.18s ease, transform 0.1s ease, box-shadow 0.18s ease;
+        }
+
+        .overview-btn:hover,
+        .overview-link-btn:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+        }
+
+        .overview-btn:active,
+        .overview-link-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);
+        }
+
+        .overview-link-btn.outline {
+            background: transparent;
+            color: #f9fafb;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+        }
+
+        .overview-link-btn.outline:hover {
+            background: rgba(15, 23, 42, 0.92);
+        }
+
+        /* Back-to-top arrow */
+        #back-to-top {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            z-index: 16;
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: radial-gradient(circle at 30% 0, #f9fafb, #e5e7eb 35%, #1d4ed8 90%);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 800;
+            opacity: 0;
+            transform: translateY(10px) scale(0.9);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        #back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        #back-to-top:hover {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+        }
+
+        #back-to-top:active {
+            transform: translateY(1px) scale(0.96);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+        }
+
+        @media (max-width: 900px) {
+
+            .centered,
+            .lefty,
+            .righty,
+            .fully {
+                width: 92vw;
+                margin: 0 auto;
+            }
+
+            .overview-card-shell {
+                width: 92vw;
+            }
+
+            #top-nav-inner {
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 6px 10px;
+            }
+
+            #top-nav button {
+                font-size: 11px;
+                padding: 5px 10px;
+            }
+
+            .step div {
+                padding: 18px 18px 22px;
+            }
+        }
+
+        /* Fix issue on mobile browser where scroll breaks  */
+        .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan,
+        .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan .mapboxgl-canvas {
+            touch-action: unset;
+        }
+
+        /* Animations */
+        @keyframes navGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map"></div>
+    <div id="scroll-progress"></div>
+
+    <!-- NAV TABS -->
+    <div id="top-nav">
+        <div id="top-nav-inner">
+            <div id="nav-active-indicator"></div>
+            <button class="nav-btn" data-target="affordable-housing-schoolhouse"
+                onclick="scrollToChapter('affordable-housing-schoolhouse')">
+                <span class="dot"></span> Affordable Housing
+            </button>
+            <button class="nav-btn" data-target="waterfront-presque-isle-gateway"
+                onclick="scrollToChapter('waterfront-presque-isle-gateway')">
+                <span class="dot"></span> World-Class Waterfront
+            </button>
+            <button class="nav-btn" data-target="economic-ironworks-square"
+                onclick="scrollToChapter('economic-ironworks-square')">
+                <span class="dot"></span> Economic Development
+            </button>
+            <button class="nav-btn" data-target="portfolio-grow-erie"
+                onclick="scrollToChapter('portfolio-grow-erie')">
+                <span class="dot"></span> Playbook Portfolio
+            </button>
+        </div>
+    </div>
+
+    <div id="story"></div>
+
+    <!-- Back-to-top arrow -->
+    <button id="back-to-top" onclick="scrollToTop()">▲</button>
+
+    <script src="./config.js"></script>
+    <script>
+        var map;
+        var marker;
+
+        var layerTypes = {
+            'fill': ['fill-opacity'],
+            'line': ['line-opacity'],
+            'circle': ['circle-opacity', 'circle-stroke-opacity'],
+            'symbol': ['icon-opacity', 'text-opacity'],
+            'raster': ['raster-opacity'],
+            'fill-extrusion': ['fill-extrusion-opacity'],
+            'heatmap': ['heatmap-opacity']
+        };
+
+        var alignments = {
+            'left': 'lefty',
+            'center': 'centered',
+            'right': 'righty',
+            'full': 'fully'
+        };
+
+        // Marker color mapping by chapter ID (matches nav dots)
+        var chapterMarkerColors = {
+            // Affordable Housing (green)
+            'affordable-housing-schoolhouse': '#22c55e',
+
+            // Waterfront (blue)
+            'waterfront-presque-isle-gateway': '#38bdf8',
+            'waterfront-erie-coke-remediation': '#38bdf8',
+
+            // Economic Development (orange)
+            'economic-ironworks-square': '#f97316',
+            'economic-catch': '#f97316',
+            'economic-mckean-business-park': '#f97316',
+
+            // Playbook Portfolio (yellow)
+            'portfolio-grow-erie': '#eab308',
+            'portfolio-peninsula-drive-trail': '#eab308',
+            'portfolio-cornerstone-clt': '#eab308',
+            'portfolio-mcheds': '#eab308',
+            'portfolio-neptwne': '#eab308',
+            'portfolio-flagship-commons': '#eab308',
+            'portfolio-mercantile-building': '#eab308',
+            'portfolio-east-lakeview-business-park': '#eab308'
+        };
+
+        // Placeholder website links (fill these with real URLs)
+        var projectLinks = {
+            'affordable-housing-schoolhouse': '',
+            'waterfront-presque-isle-gateway': '',
+            'waterfront-erie-coke-remediation': '',
+            'economic-ironworks-square': '',
+            'economic-catch': '',
+            'economic-mckean-business-park': '',
+            'portfolio-grow-erie': '',
+            'portfolio-peninsula-drive-trail': '',
+            'portfolio-cornerstone-clt': '',
+            'portfolio-mcheds': '',
+            'portfolio-neptwne': '',
+            'portfolio-flagship-commons': '',
+            'portfolio-mercantile-building': '',
+            'portfolio-east-lakeview-business-park': ''
+        };
+
+        function getCategoryInfo(id) {
+            if (id.startsWith('affordable-')) {
+                return {
+                    label: 'Affordable Housing Screen',
+                    color: '#22c55e'
+                };
+            }
+            if (id.startsWith('waterfront-')) {
+                return {
+                    label: 'World-Class Waterfront Screen',
+                    color: '#38bdf8'
+                };
+            }
+            if (id.startsWith('economic-')) {
+                return {
+                    label: 'Economic Development Screen',
+                    color: '#f97316'
+                };
+            }
+            if (id.startsWith('portfolio-')) {
+                return {
+                    label: 'Playbook Portfolio Screen',
+                    color: '#eab308'
+                };
+            }
+            return {
+                label: 'Project Screen',
+                color: '#38bdf8'
+            };
+        }
+
+        function getLayerPaintType(layer) {
+            var layerType = map.getLayer(layer).type;
+            return layerTypes[layerType];
+        }
+
+        function setLayerOpacity(layer) {
+            var paintProps = getLayerPaintType(layer.layer);
+            paintProps.forEach(function (prop) {
+                var options = {};
+                if (layer.duration) {
+                    var transitionProp = prop + "-transition";
+                    options = { "duration": layer.duration };
+                    map.setPaintProperty(layer.layer, transitionProp, options);
+                }
+                map.setPaintProperty(layer.layer, prop, layer.opacity, options);
+            });
+        }
+
+        var story = document.getElementById('story');
+        var features = document.createElement('div');
+        features.setAttribute('id', 'features');
+
+        var header = document.createElement('div');
+
+        if (config.title) {
+            var titleText = document.createElement('h1');
+            titleText.innerText = config.title;
+            header.appendChild(titleText);
+        }
+
+        if (config.subtitle) {
+            var subtitleText = document.createElement('h2');
+            subtitleText.innerText = config.subtitle;
+            header.appendChild(subtitleText);
+        }
+
+        if (config.byline) {
+            var bylineText = document.createElement('p');
+            bylineText.innerText = config.byline;
+            header.appendChild(bylineText);
+        }
+
+        if (header.innerText.length > 0) {
+            header.classList.add(config.theme);
+            header.setAttribute('id', 'header');
+            story.appendChild(header);
+        }
+
+        /* -------- Overview section (first screen with all projects) ---------- */
+        var overviewSection = document.createElement('section');
+        overviewSection.setAttribute('id', 'overview-section');
+
+        var overviewCard = document.createElement('div');
+        overviewCard.classList.add(config.theme, 'overview-card-shell');
+
+        var overviewTitle = document.createElement('h2');
+        overviewTitle.classList.add('overview-header-title');
+        overviewTitle.innerText = 'Project Screens Overview';
+
+        var overviewSubtitle = document.createElement('p');
+        overviewSubtitle.classList.add('overview-header-subtitle');
+        overviewSubtitle.innerText = 'Tap any project to open its screen, fly the map to its location, and explore full details.';
+
+        var overviewGrid = document.createElement('div');
+        overviewGrid.classList.add('overview-grid');
+
+        config.chapters.forEach((record) => {
+            var proj = document.createElement('div');
+            proj.classList.add('overview-item');
+
+            var info = getCategoryInfo(record.id);
+            var url = projectLinks[record.id];
+
+            var thumbWrap = document.createElement('div');
+            thumbWrap.classList.add('overview-thumb-wrap');
+
+            var thumb = new Image();
+            thumb.src = record.image || '';
+            thumb.classList.add('overview-thumb');
+
+            var thumbContainer;
+            if (url) {
+                thumbContainer = document.createElement('a');
+                thumbContainer.href = url;
+                thumbContainer.target = '_blank';
+                thumbContainer.rel = 'noopener noreferrer';
+                thumbContainer.classList.add('overview-thumb-link');
+                thumbContainer.addEventListener('click', function (e) {
+                    e.stopPropagation(); // don’t also scroll
+                });
+            } else {
+                thumbContainer = document.createElement('div');
+            }
+            thumbContainer.appendChild(thumb);
+            thumbWrap.appendChild(thumbContainer);
+
+            var body = document.createElement('div');
+            body.classList.add('overview-body');
+
+            var chip = document.createElement('div');
+            chip.classList.add('overview-chip');
+
+            var chipDot = document.createElement('span');
+            chipDot.classList.add('overview-chip-dot');
+            chipDot.style.background = info.color;
+
+            var chipLabel = document.createElement('span');
+            chipLabel.innerText = info.label;
+
+            chip.appendChild(chipDot);
+            chip.appendChild(chipLabel);
+
+            var title = document.createElement('h4');
+            title.classList.add('overview-title');
+            title.innerText = record.title;
+
+            var actions = document.createElement('div');
+            actions.classList.add('overview-actions');
+
+            var openBtn = document.createElement('button');
+            openBtn.type = 'button';
+            openBtn.classList.add('overview-btn');
+            openBtn.innerText = 'Open Screen';
+            openBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                scrollToChapter(record.id);
+            });
+            actions.appendChild(openBtn);
+
+            if (url) {
+                var linkBtn = document.createElement('a');
+                linkBtn.href = url;
+                linkBtn.target = '_blank';
+                linkBtn.rel = 'noopener noreferrer';
+                linkBtn.classList.add('overview-link-btn', 'outline');
+                linkBtn.innerText = 'Visit Website';
+                linkBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+                actions.appendChild(linkBtn);
+            }
+
+            body.appendChild(chip);
+            body.appendChild(title);
+            body.appendChild(actions);
+
+            proj.appendChild(thumbWrap);
+            proj.appendChild(body);
+
+            proj.addEventListener('click', function () {
+                scrollToChapter(record.id);
+            });
+
+            overviewGrid.appendChild(proj);
+        });
+
+        overviewCard.appendChild(overviewTitle);
+        overviewCard.appendChild(overviewSubtitle);
+        overviewCard.appendChild(overviewGrid);
+        overviewSection.appendChild(overviewCard);
+        story.appendChild(overviewSection);
+
+        /* -------- Chapters (scrollytelling steps) ---------- */
+        config.chapters.forEach((record, idx) => {
+            var container = document.createElement('div');
+            var chapter = document.createElement('div');
+
+            if (record.title) {
+                var title = document.createElement('h3');
+                title.innerText = record.title;
+                chapter.appendChild(title);
+            }
+
+            if (record.image) {
+                var image = new Image();
+                image.src = record.image;
+                chapter.appendChild(image);
+            }
+
+            if (record.description) {
+                var storyText = document.createElement('p');
+                storyText.innerHTML = record.description;
+                chapter.appendChild(storyText);
+            }
+
+            container.setAttribute('id', record.id);
+            container.classList.add('step');
+            if (idx === 0) {
+                container.classList.add('active');
+            }
+
+            chapter.classList.add(config.theme);
+            container.appendChild(chapter);
+            container.classList.add(alignments[record.alignment] || 'centered');
+            if (record.hidden) {
+                container.classList.add('hidden');
+            }
+            features.appendChild(container);
+        });
+
+        story.appendChild(features);
+
+        var footer = document.createElement('div');
+        if (config.footer) {
+            var footerText = document.createElement('p');
+            footerText.innerHTML = config.footer;
+            footer.appendChild(footerText);
+        }
+        if (footer.innerText.length > 0) {
+            footer.classList.add(config.theme);
+            footer.setAttribute('id', 'footer');
+            story.appendChild(footer);
+        }
+
+        mapboxgl.accessToken = config.accessToken;
+
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: config.style,
+            center: config.chapters[0].location.center,
+            zoom: config.chapters[0].location.zoom,
+            bearing: config.chapters[0].location.bearing,
+            pitch: config.chapters[0].location.pitch,
+            interactive: false,
+            projection: config.projection
+        });
+
+        // Initial marker
+        if (config.showMarkers) {
+            var firstId = config.chapters[0].id;
+            var initialColor = chapterMarkerColors[firstId] || (config.markerColor || '#3FB1CE');
+            marker = new mapboxgl.Marker({ color: initialColor });
+            marker.setLngLat(config.chapters[0].location.center).addTo(map);
+        }
+
+        if (config.inset) {
+            map.addControl(
+                new GlobeMinimap(config.insetOptions || {}),
+                config.insetPosition || 'bottom-right'
+            );
+        }
+
+        var scroller = scrollama();
+        var navButtons = document.querySelectorAll('#top-nav .nav-btn');
+        var navInner = document.getElementById('top-nav-inner');
+        var navIndicator = document.getElementById('nav-active-indicator');
+        var currentNavChapterId = config.chapters[0].id;
+
+        function updateNavIndicator(btn) {
+            if (!btn || !navIndicator || !navInner) return;
+            var btnRect = btn.getBoundingClientRect();
+            var containerRect = navInner.getBoundingClientRect();
+            var left = btnRect.left - containerRect.left;
+
+            navIndicator.style.width = btnRect.width + 'px';
+            navIndicator.style.transform = 'translateX(' + left + 'px)';
+            navIndicator.style.opacity = 1;
+        }
+
+        function setActiveNavByChapterId(id) {
+            currentNavChapterId = id;
+            var activeBtn = null;
+            navButtons.forEach(btn => {
+                var isActive = btn.dataset.target === id;
+                btn.classList.toggle('active', isActive);
+                if (isActive) activeBtn = btn;
+            });
+            if (activeBtn) updateNavIndicator(activeBtn);
+        }
+
+        function scrollToChapter(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                // offset so card doesn't touch the nav/header
+                var headerOffset = 130; // adjust if you want more/less gap
+                var rect = el.getBoundingClientRect();
+                var offsetTop = rect.top + window.pageYOffset - headerOffset;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+
+            if (map && config && config.chapters) {
+                var chapter = config.chapters.find(ch => ch.id === id);
+                if (chapter) {
+                    map[chapter.mapAnimation || 'flyTo'](chapter.location);
+                    if (config.showMarkers && marker) {
+                        marker.setLngLat(chapter.location.center);
+                        var newColor = chapterMarkerColors[id] || config.markerColor;
+                        if (newColor && typeof marker.setColor === 'function') {
+                            marker.setColor(newColor);
+                        }
+                    }
+                }
+            }
+
+            setActiveNavByChapterId(id);
+        }
+
+        window.scrollToChapter = scrollToChapter; // for inline onclick
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setActiveNavByChapterId(config.chapters[0].id);
+        }
+        window.scrollToTop = scrollToTop;
+
+        // Scroll progress bar + back-to-top visibility
+        var progressBar = document.getElementById('scroll-progress');
+        var backToTopBtn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            var scrollTop = window.scrollY || window.pageYOffset;
+            var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            var progress = docHeight > 0 ? scrollTop / docHeight : 0;
+            progressBar.style.transform = 'scaleX(' + progress + ')';
+
+            if (scrollTop > 600) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        // Recalculate nav indicator on resize
+        window.addEventListener('resize', () => {
+            var activeChapter = currentNavChapterId;
+            var activeBtn = Array.from(navButtons).find(btn => btn.dataset.target === activeChapter);
+            if (activeBtn) updateNavIndicator(activeBtn);
+        });
+
+        map.on("load", function () {
+            if (config.use3dTerrain) {
+                map.addSource('mapbox-dem', {
+                    'type': 'raster-dem',
+                    'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                    'tileSize': 512,
+                    'maxzoom': 14
+                });
+                map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 3 });
+                map.addLayer({
+                    'id': 'sky',
+                    'type': 'sky',
+                    'paint': {
+                        'sky-type': 'atmosphere',
+                        'sky-atmosphere-sun': [0.0, 0.0],
+                        'sky-atmosphere-sun-intensity': 15
+                    }
+                });
+            }
+
+            setActiveNavByChapterId(config.chapters[0].id);
+
+            scroller
+                .setup({
+                    step: '.step',
+                    offset: 0.5,
+                    progress: true
+                })
+                .onStepEnter(response => {
+                    var current_chapter = config.chapters.findIndex(chap => chap.id === response.element.id);
+                    var chapter = config.chapters[current_chapter];
+
+                    response.element.classList.add('active');
+                    map[chapter.mapAnimation || 'flyTo'](chapter.location);
+
+                    if (config.showMarkers && marker) {
+                        marker.setLngLat(chapter.location.center);
+                        var newColor = chapterMarkerColors[chapter.id];
+                        if (newColor && typeof marker.setColor === 'function') {
+                            marker.setColor(newColor);
+                        }
+                    }
+
+                    if (chapter.onChapterEnter.length > 0) {
+                        chapter.onChapterEnter.forEach(setLayerOpacity);
+                    }
+                    if (chapter.callback) {
+                        window[chapter.callback]();
+                    }
+                    if (chapter.rotateAnimation) {
+                        map.once('moveend', () => {
+                            const rotateNumber = map.getBearing();
+                            map.rotateTo(rotateNumber + 180, {
+                                duration: 30000,
+                                easing: function (t) { return t; }
+                            });
+                        });
+                    }
+
+                    setActiveNavByChapterId(chapter.id);
+                })
+                .onStepExit(response => {
+                    var chapter = config.chapters.find(chap => chap.id === response.element.id);
+                    response.element.classList.remove('active');
+                    if (chapter.onChapterExit.length > 0) {
+                        chapter.onChapterExit.forEach(setLayerOpacity);
+                    }
+                });
+        });
+    </script>
+
+</body>
+
+</html>
