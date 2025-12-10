@@ -17,7 +17,7 @@ var config = {
     auto: false,
     title: '2026 Infinite Erie Playbook Priorities',
     subtitle: '',
-    byline: 'By Aashish K C',
+    byline: '',
     footer: 'Source: Infinite Erie Playbook & Erie County <br>Created using <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a> template.',
     chapters: [
 

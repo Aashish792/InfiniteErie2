@@ -206,7 +206,7 @@
             font-size: 1.28rem;
         }
 
-        /* Smaller images, no cropping, centered */
+        /* Chapter images (cards) – smaller, not cropped, centered */
         .step img {
             width: 86%;
             max-width: 520px;
@@ -328,7 +328,7 @@
             box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.7);
         }
 
-        /* Overview section (home screen with all projects) */
+        /* -------- Overview / Home grid -------- */
         #overview-section {
             margin-top: 10px;
         }
@@ -353,45 +353,59 @@
             opacity: 0.9;
         }
 
+        /* GRID of project tiles */
         .overview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 10px;
-            margin-top: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
         }
 
+        /* Each project card */
         .overview-item {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(15, 23, 42, 0.88);
-            border-radius: 18px;
-            padding: 8px 10px;
+            flex-direction: column;
+            align-items: stretch;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 20px;
+            padding: 10px 10px 12px;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
             border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
         }
 
         .overview-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
-            background: rgba(15, 23, 42, 0.97);
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+            background: rgba(15, 23, 42, 0.98);
             border-color: rgba(248, 250, 252, 0.18);
         }
 
+        /* Image wrapper: fixed aspect ratio, image not cropped */
         .overview-thumb-wrap {
-            flex: 0 0 70px;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 16px;
+            overflow: hidden;
+            background: radial-gradient(circle at top, #020617, #020617 60%, #0b1120);
+            padding: 6px;
+            box-sizing: border-box;
+            margin-bottom: 8px;
         }
 
         .overview-thumb-link {
             display: block;
+            width: 100%;
+            height: 100%;
         }
 
         .overview-thumb {
-            width: 68px;
-            height: 68px;
-            border-radius: 14px;
-            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* show full image, no crop */
+            border-radius: 12px;
             display: block;
         }
 
@@ -423,7 +437,7 @@
         }
 
         .overview-title {
-            margin: 0;
+            margin: 2px 0 0;
             font-size: 0.92rem;
         }
 
@@ -431,7 +445,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 4px;
+            margin-top: 6px;
         }
 
         .overview-btn,
@@ -617,9 +631,9 @@
         var map;
         var marker;
 
-        // --- NEW: top-level global view for the globe ---
+        // --- top-level global view for the globe ---
         var initialView = {
-            center: [-40, 30], // somewhere over the Atlantic, shows Americas + Europe/Africa
+            center: [-40, 30], // shows Americas + Europe/Africa
             zoom: 1.2,
             pitch: 0,
             bearing: 0
@@ -667,7 +681,7 @@
             'portfolio-east-lakeview-business-park': '#eab308'
         };
 
-        // Placeholder website links (fill these with real URLs)
+        // Website links per project (fill out as you get URLs)
         var projectLinks = {
             'affordable-housing-schoolhouse': 'https://www.hamothealthfoundation.org/corporators/2025-corporator-project-schoolhouse-apartments',
             'waterfront-presque-isle-gateway': '',
@@ -734,7 +748,7 @@
             });
         }
 
-        var story = document.getElementById('story');
+        var storyContainer = document.getElementById('story');
         var features = document.createElement('div');
         features.setAttribute('id', 'features');
 
@@ -761,10 +775,10 @@
         if (header.innerText.length > 0) {
             header.classList.add(config.theme);
             header.setAttribute('id', 'header');
-            story.appendChild(header);
+            storyContainer.appendChild(header);
         }
 
-        /* -------- Overview section (first screen with all projects) ---------- */
+        /* -------- Overview section (home screen with all projects) ---------- */
         var overviewSection = document.createElement('section');
         overviewSection.setAttribute('id', 'overview-section');
 
@@ -792,25 +806,28 @@
             var thumbWrap = document.createElement('div');
             thumbWrap.classList.add('overview-thumb-wrap');
 
-            var thumb = new Image();
-            thumb.src = record.image || '';
-            thumb.classList.add('overview-thumb');
+            if (record.image) {
+                var thumb = new Image();
+                thumb.src = record.image;
+                thumb.classList.add('overview-thumb');
 
-            var thumbContainer;
-            if (url) {
-                thumbContainer = document.createElement('a');
-                thumbContainer.href = url;
-                thumbContainer.target = '_blank';
-                thumbContainer.rel = 'noopener noreferrer';
-                thumbContainer.classList.add('overview-thumb-link');
-                thumbContainer.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
-            } else {
-                thumbContainer = document.createElement('div');
+                var thumbContainer;
+                if (url) {
+                    thumbContainer = document.createElement('a');
+                    thumbContainer.href = url;
+                    thumbContainer.target = '_blank';
+                    thumbContainer.rel = 'noopener noreferrer';
+                    thumbContainer.classList.add('overview-thumb-link');
+                    thumbContainer.addEventListener('click', function (e) {
+                        e.stopPropagation(); // don't trigger scrollToChapter
+                    });
+                } else {
+                    thumbContainer = document.createElement('div');
+                    thumbContainer.classList.add('overview-thumb-link');
+                }
+                thumbContainer.appendChild(thumb);
+                thumbWrap.appendChild(thumbContainer);
             }
-            thumbContainer.appendChild(thumb);
-            thumbWrap.appendChild(thumbContainer);
 
             var body = document.createElement('div');
             body.classList.add('overview-body');
@@ -828,9 +845,9 @@
             chip.appendChild(chipDot);
             chip.appendChild(chipLabel);
 
-            var title = document.createElement('h4');
-            title.classList.add('overview-title');
-            title.innerText = record.title;
+            var titleEl = document.createElement('h4');
+            titleEl.classList.add('overview-title');
+            titleEl.innerText = record.title;
 
             var actions = document.createElement('div');
             actions.classList.add('overview-actions');
@@ -859,7 +876,7 @@
             }
 
             body.appendChild(chip);
-            body.appendChild(title);
+            body.appendChild(titleEl);
             body.appendChild(actions);
 
             proj.appendChild(thumbWrap);
@@ -876,7 +893,7 @@
         overviewCard.appendChild(overviewSubtitle);
         overviewCard.appendChild(overviewGrid);
         overviewSection.appendChild(overviewCard);
-        story.appendChild(overviewSection);
+        storyContainer.appendChild(overviewSection);
 
         /* -------- Chapters (scrollytelling steps) ---------- */
         config.chapters.forEach((record, idx) => {
@@ -884,15 +901,26 @@
             var chapter = document.createElement('div');
 
             if (record.title) {
-                var title = document.createElement('h3');
-                title.innerText = record.title;
-                chapter.appendChild(title);
+                var chapterTitle = document.createElement('h3');
+                chapterTitle.innerText = record.title;
+                chapter.appendChild(chapterTitle);
             }
 
             if (record.image) {
                 var image = new Image();
                 image.src = record.image;
-                chapter.appendChild(image);
+
+                var url = projectLinks[record.id];
+                if (url) {
+                    var imgLink = document.createElement('a');
+                    imgLink.href = url;
+                    imgLink.target = '_blank';
+                    imgLink.rel = 'noopener noreferrer';
+                    imgLink.appendChild(image);
+                    chapter.appendChild(imgLink);
+                } else {
+                    chapter.appendChild(image);
+                }
             }
 
             if (record.description) {
@@ -916,7 +944,7 @@
             features.appendChild(container);
         });
 
-        story.appendChild(features);
+        storyContainer.appendChild(features);
 
         var footer = document.createElement('div');
         if (config.footer) {
@@ -927,7 +955,7 @@
         if (footer.innerText.length > 0) {
             footer.classList.add(config.theme);
             footer.setAttribute('id', 'footer');
-            story.appendChild(footer);
+            storyContainer.appendChild(footer);
         }
 
         mapboxgl.accessToken = config.accessToken;
@@ -944,7 +972,7 @@
             projection: 'globe'
         });
 
-        // Initial marker (still points to first Erie project)
+        // Initial marker
         if (config.showMarkers) {
             var firstId = config.chapters[0].id;
             var initialColor = chapterMarkerColors[firstId] || (config.markerColor || '#3FB1CE');
@@ -990,8 +1018,7 @@
         function scrollToChapter(id) {
             var el = document.getElementById(id);
             if (el) {
-                // offset so card doesn't touch the nav/header
-                var headerOffset = 130;
+                var headerOffset = 130; // offset so card doesn't touch nav
                 var rect = el.getBoundingClientRect();
                 var offsetTop = rect.top + window.pageYOffset - headerOffset;
                 window.scrollTo({
@@ -1016,13 +1043,11 @@
 
             setActiveNavByChapterId(id);
         }
-
-        window.scrollToChapter = scrollToChapter; // for inline onclick
+        window.scrollToChapter = scrollToChapter;
 
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // When going back to top, also reset map to global view
             if (map) {
                 map.flyTo({
                     center: initialView.center,
@@ -1061,7 +1086,6 @@
         });
 
         map.on("load", function () {
-            // Ensure globe projection + nice atmosphere
             map.setProjection('globe');
             map.setFog({
                 range: [0.8, 8],
@@ -1072,7 +1096,7 @@
                 'star-intensity': 0.2
             });
 
-            // Disable scroll zoom so story scroll isn't hijacked, but keep map interactive
+            // disable scroll zoom to keep scrollytelling smooth
             map.scrollZoom.disable();
 
             if (config.use3dTerrain) {
